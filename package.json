@@ -1,0 +1,11 @@
+{
+  "name": "smart-contracts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:ghana7989/hackathon-smart-contracts.git",
+  "author": "Pavan <pavan.chindukuri@mosaicwellness.in>",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.1"
+  }
+}
