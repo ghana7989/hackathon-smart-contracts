@@ -156,6 +156,29 @@ contract CFP {
         return true;
     }
 
+    function updateCreator(
+        string memory _name,
+        string memory _email,
+        string memory _website,
+        string memory _socialMedia,
+        string memory _photo
+    ) public returns (bool) {
+        require(creatorExists[msg.sender], "Creator does not exist");
+        require(
+            msg.sender == creatorAddressCreatorMap[msg.sender].creator,
+            "Only creator can update creator details"
+        );
+        Creator memory newCreator;
+        newCreator.creator = msg.sender;
+        newCreator.name = _name;
+        newCreator.email = _email;
+        newCreator.website = _website;
+        newCreator.socialMedia = _socialMedia;
+        newCreator.photo = _photo;
+        creatorAddressCreatorMap[msg.sender] = newCreator;
+        return true;
+    }
+
     function getUserDonations(address userAddress)
         public
         view
