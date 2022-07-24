@@ -1,17 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
+import "./Token.sol";
 
-/**
-Create a donation application where users can donate cryptocurrency to their favourite content creators(test cryptocurrency is fine) .
-Create separate login and dashboard pages for content creators to update their information like photo, email id, website link and social media ids.
-Users of content creators should have the ability to login to the portal and browse among existing content creators according to their choice.
-Users should be able to send cryptocurrency(Neo/Ether/BTC,etc.) to the content creator after choosing one from existing content creators.
-User Analytics and Creator Analytics should be included in a separate page. Logged in User can see only his personal analytics(ie. How much he has donated to which creator)
-Creator Analytics should only be visible to creators which will include details regarding donation received from individual users
-If an entity is both a creator and a user, then he shall be able to see both creator analytics and user analytics. 
- */
-
-contract CFP {
+contract CFP is CreatorToken {
     struct User {
         string name;
         address user;
@@ -50,6 +41,8 @@ contract CFP {
 
     // Balances
     mapping(address => uint256) creatorAddressBalanceMap;
+
+    constructor() {}
 
     function compareStrings(string memory a, string memory b)
         private
@@ -225,6 +218,9 @@ contract CFP {
         newUser.isCreator = false;
         userAddressUserMap[msg.sender] = newUser;
         userExists[msg.sender] = true;
+
+        _mint(msg.sender, 1000);
+
         return true;
     }
 
@@ -254,5 +250,41 @@ contract CFP {
 
         userAddressDonationsMap[msg.sender].push(newDonation);
         creatorAddressDonationsMap[_to].push(newDonation);
+    }
+
+    // creatorAddressToUsers get random user given the creator address
+    function getRandomUserAddress(address creatorAddress)
+        private
+        view
+        returns (address)
+    {
+        require(
+            msg.sender == creatorAddress,
+            "Only creator can get random user"
+        );
+        require(creatorExists[creatorAddress], "Creator does not exist");
+        require(
+            creatorAddressToUsers[creatorAddress].length > 0,
+            "Creator has no users"
+        );
+        User memory user;
+        uint256 randomIndex = uint256(
+            block.timestamp %
+                uint256(creatorAddressToUsers[creatorAddress].length)
+        );
+        user = creatorAddressToUsers[creatorAddress][randomIndex];
+        return user.user;
+    }
+
+    // creators get the random creator and then transfer them the ERC20 tokens this is like giveaway
+    function runGiveaway(address creatorAddress) public {
+        require(msg.sender == creatorAddress, "Only creator can run giveaway");
+        require(creatorExists[creatorAddress], "Creator does not exist");
+        require(
+            creatorAddressToUsers[creatorAddress].length > 0,
+            "Creator has no users"
+        );
+        address randomUser = getRandomUserAddress(creatorAddress);
+        _mint(payable(randomUser), 1000);
     }
 }

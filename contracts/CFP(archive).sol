@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-contract CFP {
+contract CFPARCHIVE {
     struct Creator {
         address creator;
         string name;
@@ -22,6 +22,10 @@ contract CFP {
         address to;
         uint256 amount;
     }
+
+    event NewCreator(Creator creator);
+    event NewUser(User user);
+    event NewDonation(Donation donation);
     // owner of the contract
     address public owner;
     // list of all the creators
