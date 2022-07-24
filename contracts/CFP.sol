@@ -23,6 +23,24 @@ contract CFP is CreatorToken {
         uint256 amount;
         uint256 timestamp;
     }
+
+    event NewUser(address indexed user, string name);
+    event NewCreator(
+        address indexed creator,
+        string name,
+        string indexed email,
+        string website,
+        string socialMedia,
+        string photo,
+        string category
+    );
+    event NewDonation(
+        address indexed to,
+        address indexed from,
+        uint256 amount,
+        uint256 indexed timestamp
+    );
+
     mapping(address => Donation[]) userAddressDonationsMap;
     mapping(address => mapping(address => uint256)) amountUserDonatedToCreatorMap;
     mapping(address => Creator[]) userAddressToCreators;
@@ -146,6 +164,15 @@ contract CFP is CreatorToken {
             userAddressUserMap[msg.sender] = newUser;
             userExists[msg.sender] = true;
         }
+        emit NewCreator(
+            msg.sender,
+            _name,
+            _email,
+            _website,
+            _socialMedia,
+            _photo,
+            ""
+        );
         return true;
     }
 
@@ -221,6 +248,8 @@ contract CFP is CreatorToken {
 
         _mint(msg.sender, 1000);
 
+        emit NewUser(msg.sender, _name);
+
         return true;
     }
 
@@ -250,6 +279,7 @@ contract CFP is CreatorToken {
 
         userAddressDonationsMap[msg.sender].push(newDonation);
         creatorAddressDonationsMap[_to].push(newDonation);
+        emit NewDonation(msg.sender, _to, msg.value, block.timestamp);
     }
 
     // creatorAddressToUsers get random user given the creator address
